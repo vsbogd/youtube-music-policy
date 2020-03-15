@@ -107,6 +107,20 @@ function oncheck() {
 	loop();
 }
 
+function get_runtime() {
+	if (typeof browser !== "undefined") {
+		console.log("mozilla");
+		return browser.runtime;
+	}
+	if (typeof chrome !== "undefined") {
+		console.log("chrome");
+		return chrome.runtime;
+	}
+
+	console.log("other");
+	return extension;
+}
+
 var file_selector = document.createElement("input");
 file_selector.setAttribute("type", "file");
 file_selector.setAttribute("multiple", "");
@@ -117,7 +131,7 @@ check_button.setAttribute("value", "Check");
 check_button.onclick = oncheck;
 
 var loading_img = document.createElement("img");
-loading_img.setAttribute("src", browser.runtime.getURL("./icons/loading-103.gif"));
+loading_img.setAttribute("src", get_runtime().getURL("icons/loading-103.gif"));
 // TODO: find out when one should use setAttribute and when fields?
 loading_img.style.visibility = "hidden";
 loading_img.style.height = "0px";
