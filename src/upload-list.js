@@ -59,10 +59,10 @@ function filename_to_query(filename) {
 	return query;
 }
 
-function add_result(text) {
-	console.log("add_result: text = " + text);
+function add_result(html) {
+	console.log("add_result: html = " + html);
 	var result = document.createElement("p");
-	result.innerHTML += text
+	result.innerHTML += html;
 	result_div.appendChild(result);
 }
 
@@ -90,9 +90,11 @@ function oncheck() {
 		if (i < files.length) {
 			get_policy(files[i++], loop);
 		} else {
-			add_result("Finished.");
+			loading_img.style.visibility = "hidden";
 		}
 	};
+	loading_img.style.height = check_button.offsetHeight + "px";
+	loading_img.style.visibility = "visible";
 	loop();
 }
 
@@ -105,9 +107,16 @@ check_button.setAttribute("type", "button");
 check_button.setAttribute("value", "Check");
 check_button.onclick = oncheck;
 
+var loading_img = document.createElement("img");
+loading_img.setAttribute("src", browser.runtime.getURL("./icons/loading-103.gif"));
+// TODO: find out when one should use setAttribute and when fields?
+loading_img.style.visibility = "hidden";
+loading_img.style.height = "0px";
+
 var button_div = document.createElement("div");
 button_div.appendChild(file_selector);
 button_div.appendChild(check_button);
+button_div.appendChild(loading_img);
 
 var gui = document.createElement("div");
 gui.setAttribute("id", "youtube-music-policy-extension");
