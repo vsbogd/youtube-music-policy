@@ -9,7 +9,7 @@ function get_policy(file, callback) {
 		$.getJSON(url, function(response) {
 			console.log("request asset filename: " + filename + ", response: " + JSON.stringify(response));
 			if (response.tracks.length == 0) {
-				add_result("&quot;" + filename + "&quot;, &quot;" + "not found" + "&quot;");
+				add_result(filename, "no", "");
 				callback();
 				return;
 			}
@@ -21,7 +21,7 @@ function get_policy(file, callback) {
 			console.log("request policy filename: " + filename + ", url: " + url);
 			$.getJSON(url, function(response) {
 				console.log("request policy response: " + filename + ", response: " + JSON.stringify(response));
-				add_result("&quot;" + filename + "&quot;, &quot;" + format_policy(response) + "&quot;");
+				add_result(filename, "yes", format_policy(response));
 				callback();
 			});
 		});
@@ -59,27 +59,38 @@ function filename_to_query(filename) {
 	return query;
 }
 
-function add_result(html) {
-	console.log("add_result: html = " + html);
-	var result = document.createElement("p");
-	result.innerHTML += html;
-	result_div.appendChild(result);
+function add_result(filename, found, restricted_countries) {
+	console.log("add_result: filename: " + filename + " found: " + found
+		+ " restricted_countries: " + restricted_countries);
+	var row = document.createElement("tr");
+	row.appendChild(create_td(filename));
+	row.appendChild(create_td(found));
+	row.appendChild(create_td(restricted_countries));
+	result_table.appendChild(row);
+}
+
+function create_td(text) {
+	var td = document.createElement("td");
+	td.innerHTML += text;
+	return td;
 }
 
 function format_policy(response) {
 	if (!response.is_available) {
-		return "not available anywhere";
+		return "Not available anywhere";
 	}
 	if (response.sr_policy
 		&& response.sr_policy.restrictions
 		&& response.sr_policy.restrictions.blocked_terr_names) {
 
 		var blocked_terr = response.sr_policy.restrictions.blocked_terr_names;
-		if (blocked_terr.includes("Россия") || blocked_terr.includes("Russia")) {
-			return "not available in Russia";
+		var result = "";
+		for (var i = 0; i < blocked_terr.length; ++i) {
+			result += blocked_terr[i] + ", ";
 		}
+		return result;
 	}
-	return "ok";
+	return "Available everywhere";
 }
 
 function oncheck() {
@@ -118,10 +129,14 @@ button_div.appendChild(file_selector);
 button_div.appendChild(check_button);
 button_div.appendChild(loading_img);
 
+var result_table = document.createElement("table");
+result_table.setAttribute("width", "100%");
+add_result("File name", "Found", "Restrictions");
+
 var gui = document.createElement("div");
 gui.setAttribute("id", "youtube-music-policy-extension");
 gui.appendChild(button_div);
-var result_div = gui.appendChild(document.createElement("div"));
+gui.appendChild(result_table);
 
 var old_gui = document.querySelector('[id="youtube-music-policy-extension"]');
 if (old_gui != null) {
