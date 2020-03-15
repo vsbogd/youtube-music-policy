@@ -107,23 +107,8 @@ function oncheck() {
 			loading_img.style.visibility = "hidden";
 		}
 	};
-	loading_img.style.height = check_button.offsetHeight + "px";
 	loading_img.style.visibility = "visible";
 	loop();
-}
-
-function get_runtime() {
-	if (typeof browser !== "undefined") {
-		console.log("mozilla");
-		return browser.runtime;
-	}
-	if (typeof chrome !== "undefined") {
-		console.log("chrome");
-		return chrome.runtime;
-	}
-
-	console.log("other");
-	return extension;
 }
 
 var file_selector = document.createElement("input");
@@ -135,11 +120,10 @@ check_button.setAttribute("type", "button");
 check_button.setAttribute("value", "Check");
 check_button.onclick = oncheck;
 
-var loading_img = document.createElement("img");
-loading_img.setAttribute("src", get_runtime().getURL("icons/loading-103.gif"));
+var loading_img = document.createElement("span");
+loading_img.setAttribute("class", "yt-spinner-img  yt-sprite");
 // TODO: find out when one should use setAttribute and when fields?
 loading_img.style.visibility = "hidden";
-loading_img.style.height = "0px";
 
 var country_label = document.createElement("label");
 country_label.innerHTML += "Your country name: ";

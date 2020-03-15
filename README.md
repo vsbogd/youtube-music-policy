@@ -19,5 +19,3 @@ Results are placed into `./build` directory.
 Thirdparty resources and libraries used:
 - [jQuery](https://jquery.com/)
 - [JavaScript ID3 reader](https://github.com/aadsm/JavaScript-ID3-Reader)
-- [Loading
-icon](https://commons.wikimedia.org/wiki/File:Loading_icon_cropped.gif)
