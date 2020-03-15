@@ -3,7 +3,7 @@
   "name": "YouTube Music Policy",
   "version": "1.0",
 
-  "description": "Allows checking YouTube music policy for many files at once",
+  "description": "A web extention to automate checking large amount of music files via YouTube music policy web-page.",
 
   "icons": {
     "64": "icons/youtube-64.png"

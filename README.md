@@ -1,8 +1,8 @@
 # Overview
 
-This is a web extention to automate checking large number of your music files
-via YouTube music policy web-page.  Extention adds to the page controls to
-select multiple files and check them.
+A web extention to automate checking large amount of music files via YouTube
+music policy web-page. Extention adds to the page the controls to select
+multiple files, check them and show results.
 
 # Build
 
