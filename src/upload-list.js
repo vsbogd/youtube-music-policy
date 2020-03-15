@@ -9,7 +9,7 @@ function get_policy(file, callback) {
 		$.getJSON(url, function(response) {
 			console.log("request asset filename: " + filename + ", response: " + JSON.stringify(response));
 			if (response.tracks.length == 0) {
-				add_result(filename, "no", "");
+				add_result(filename, query, "no", "");
 				callback();
 				return;
 			}
@@ -21,7 +21,7 @@ function get_policy(file, callback) {
 			console.log("request policy filename: " + filename + ", url: " + url);
 			$.getJSON(url, function(response) {
 				console.log("request policy response: " + filename + ", response: " + JSON.stringify(response));
-				add_result(filename, "yes", format_policy(response));
+				add_result(filename, query, "yes", format_policy(response));
 				callback();
 			});
 		});
@@ -59,11 +59,12 @@ function filename_to_query(filename) {
 	return query;
 }
 
-function add_result(filename, found, restricted_countries) {
+function add_result(filename, query, found, restricted_countries) {
 	console.log("add_result: filename: " + filename + " found: " + found
 		+ " restricted_countries: " + restricted_countries);
 	var row = document.createElement("tr");
 	row.appendChild(create_td(filename));
+	row.appendChild(create_td(query));
 	row.appendChild(create_td(found));
 	row.appendChild(create_td(restricted_countries));
 	result_table.appendChild(row);
@@ -93,6 +94,10 @@ function format_policy(response) {
 
 function oncheck() {
 	console.log("check_button.onclick");
+	if (country_text.value === "") {
+		alert("Type your country name");
+		return;
+	}
 	var files = file_selector.files;
 	var i = 0;
 	var loop = function() {
@@ -150,7 +155,7 @@ button_div.appendChild(loading_img);
 
 var result_table = document.createElement("table");
 result_table.setAttribute("width", "100%");
-add_result("File name", "Found", "Available in your country");
+add_result("File name", "Query", "Found", "Available in your country");
 
 var gui = document.createElement("div");
 gui.setAttribute("id", "youtube-music-policy-extension");
