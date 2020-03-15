@@ -77,20 +77,18 @@ function create_td(text) {
 
 function format_policy(response) {
 	if (!response.is_available) {
-		return "Not available anywhere";
+		return "no";
 	}
 	if (response.sr_policy
 		&& response.sr_policy.restrictions
 		&& response.sr_policy.restrictions.blocked_terr_names) {
 
 		var blocked_terr = response.sr_policy.restrictions.blocked_terr_names;
-		var result = "";
-		for (var i = 0; i < blocked_terr.length; ++i) {
-			result += blocked_terr[i] + ", ";
+		if (blocked_terr.includes(country_text.value)) {
+			return "no";
 		}
-		return result;
 	}
-	return "Available everywhere";
+	return "yes";
 }
 
 function oncheck() {
@@ -124,14 +122,21 @@ loading_img.setAttribute("src", browser.runtime.getURL("./icons/loading-103.gif"
 loading_img.style.visibility = "hidden";
 loading_img.style.height = "0px";
 
+var country_label = document.createElement("label");
+country_label.innerHTML += "Your country name: ";
+var country_text = document.createElement("input");
+country_text.setAttribute("type", "text");
+country_label.appendChild(country_text);
+
 var button_div = document.createElement("div");
+button_div.appendChild(country_label);
 button_div.appendChild(file_selector);
 button_div.appendChild(check_button);
 button_div.appendChild(loading_img);
 
 var result_table = document.createElement("table");
 result_table.setAttribute("width", "100%");
-add_result("File name", "Found", "Restrictions");
+add_result("File name", "Found", "Available in your country");
 
 var gui = document.createElement("div");
 gui.setAttribute("id", "youtube-music-policy-extension");
