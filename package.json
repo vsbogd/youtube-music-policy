@@ -1,0 +1,19 @@
+{
+  "name": "youtube-music-policy",
+  "version": "1.0.0",
+  "description": "Check YouTube music policy for the multiple files at once",
+  "main": "index.js",
+  "devDependencies": {
+    "web-ext": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vsbogd/youtube-music-policy.git"
+  },
+  "author": "Vitaly Bogdanov <vsbogd@gmail.com>",
+  "license": "GNU AGPL v3.0",
+  "bugs": {
+    "url": "https://github.com/vsbogd/youtube-music-policy/issues"
+  },
+  "homepage": "https://github.com/vsbogd/youtube-music-policy#readme"
+}

@@ -1,0 +1,19 @@
+{
+  "manifest_version": 2,
+  "name": "YouTube Music Policy",
+  "version": "1.0",
+
+  "description": "Allows checking YouTube music policy for many files at once",
+
+  "icons": {
+    "48": "icons/youtube-48.png"
+  },
+  
+  "content_scripts": [
+  	  {
+  	  	  "matches": ["*://*.youtube.com/music_policies*"],
+  	  	  "js": ["upload-list.js", "thirdparty/jquery-3.4.1.min.js",
+  	  	  	  "thirdparty/id3-minimized.js"]
+  	  }
+  ]
+}
