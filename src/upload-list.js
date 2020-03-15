@@ -9,7 +9,7 @@ function get_policy(file, callback) {
 		$.getJSON(url, function(response) {
 			console.log("request asset filename: " + filename + ", response: " + JSON.stringify(response));
 			if (response.tracks.length == 0) {
-				add_result("&quot;" + filename + "&quot;, &quot;" + "no response" + "&quot;");
+				add_result("&quot;" + filename + "&quot;, &quot;" + "not found" + "&quot;");
 				callback();
 				return;
 			}
