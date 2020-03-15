@@ -1,7 +1,16 @@
 function get_policy(file, callback) {
 	var filename = file.name;
+	var result = {
+		filename: filename,
+		found: "",
+		artist: "",
+		title: "",
+		restricted_countries: "",
+		query: ""
+	};
 	console.log("get_policy: filename = " + filename);
 	get_query(file, function(query) {
+		result.query = query;
 		console.log("query: " + query);
 		var url = "https://www.youtube.com/audioswap_ajax?action_get_tracks=1&q=" +
 			encodeURIComponent(query) + "&s=ad_supported_music&mr=25&si=0&qid=1&sh=true";
@@ -9,19 +18,25 @@ function get_policy(file, callback) {
 		$.getJSON(url, function(response) {
 			console.log("request asset filename: " + filename + ", response: " + JSON.stringify(response));
 			if (response.tracks.length == 0) {
-				add_result(filename, query, "no", "");
+				result.found = "no";
+				add_result(result);
 				callback();
 				return;
 			}
-			var asset_id = response.tracks[0].asset_id;
-			var isrc = response.tracks[0].isrc;
+			var track = response.tracks[0];
+			result.artist = track.artist;
+			result.title = track.title;
+			var asset_id = track.asset_id;
+			var isrc = track.isrc;
 			var url = "https://www.youtube.com/audioswap_ajax?action_get_track_details=1"
 				+ "&asset_id=" + asset_id + "&um=false&are=false"
 				+ "&isrc=" + isrc;
 			console.log("request policy filename: " + filename + ", url: " + url);
 			$.getJSON(url, function(response) {
 				console.log("request policy response: " + filename + ", response: " + JSON.stringify(response));
-				add_result(filename, query, "yes", format_policy(response));
+				result.found = "yes";
+				result.restricted_countries = format_policy(response);
+				add_result(result);
 				callback();
 			});
 		});
@@ -59,14 +74,15 @@ function filename_to_query(filename) {
 	return query;
 }
 
-function add_result(filename, query, found, restricted_countries) {
-	console.log("add_result: filename: " + filename + " found: " + found
-		+ " restricted_countries: " + restricted_countries);
+function add_result(result) {
+	console.log("add_result: result: " + JSON.stringify(result));
 	var row = document.createElement("tr");
-	row.appendChild(create_td(filename));
-	row.appendChild(create_td(query));
-	row.appendChild(create_td(found));
-	row.appendChild(create_td(restricted_countries));
+	row.appendChild(create_td(result.filename));
+	row.appendChild(create_td(result.found));
+	row.appendChild(create_td(result.artist));
+	row.appendChild(create_td(result.title));
+	row.appendChild(create_td(result.restricted_countries));
+	row.appendChild(create_td(result.query));
 	result_table.appendChild(row);
 }
 
@@ -139,7 +155,14 @@ button_div.appendChild(loading_img);
 
 var result_table = document.createElement("table");
 result_table.setAttribute("width", "100%");
-add_result("File name", "Query", "Found", "Available in your country");
+add_result({
+	filename: "File name",
+	found: "Found",
+	artist: "Artist",
+	title: "Title",
+	restricted_countries: "Available in your country",
+	query: "Query"
+});
 
 var gui = document.createElement("div");
 gui.setAttribute("id", "youtube-music-policy-extension");
