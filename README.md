@@ -13,3 +13,10 @@ npm install
 ./node_modules/.bin/web-ext build --artifacts-dir ./build --source-dir ./src
 ```
 Results are placed into `./build` directory.
+
+# Third party resources
+
+[YouTube
+icon](http://www.iconarchive.com/show/simply-styled-icons-by-dakirby309/YouTube-icon.html)
+[jQuery](https://jquery.com/)
+[JavaScript ID3 reader](https://github.com/aadsm/JavaScript-ID3-Reader)
