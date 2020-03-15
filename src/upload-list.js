@@ -63,7 +63,7 @@ function add_result(text) {
 	console.log("add_result: text = " + text);
 	var result = document.createElement("p");
 	result.innerHTML += text
-	last_line = audio_library_browser.insertBefore(result, last_line.nextSibling);
+	result_div.appendChild(result);
 }
 
 function format_policy(response) {
@@ -82,15 +82,8 @@ function format_policy(response) {
 	return "ok";
 }
 
-var file_selector = document.createElement("input");
-file_selector.setAttribute("type", "file");
-file_selector.setAttribute("multiple", "");
-
-var many_files_button = document.createElement("input");
-many_files_button.setAttribute("type", "button");
-many_files_button.setAttribute("value", "Check");
-many_files_button.onclick = function() {
-	console.log("many_files_button.onclick");
+function oncheck() {
+	console.log("check_button.onclick");
 	var files = file_selector.files;
 	var i = 0;
 	var loop = function() {
@@ -103,9 +96,27 @@ many_files_button.onclick = function() {
 	loop();
 }
 
-var div = document.createElement("div");
-div.appendChild(file_selector);
-div.appendChild(many_files_button);
+var file_selector = document.createElement("input");
+file_selector.setAttribute("type", "file");
+file_selector.setAttribute("multiple", "");
 
+var check_button = document.createElement("input");
+check_button.setAttribute("type", "button");
+check_button.setAttribute("value", "Check");
+check_button.onclick = oncheck;
+
+var button_div = document.createElement("div");
+button_div.appendChild(file_selector);
+button_div.appendChild(check_button);
+
+var gui = document.createElement("div");
+gui.setAttribute("id", "youtube-music-policy-extension");
+gui.appendChild(button_div);
+var result_div = gui.appendChild(document.createElement("div"));
+
+var old_gui = document.querySelector('[id="youtube-music-policy-extension"]');
+if (old_gui != null) {
+	old_gui.parentNode.removeChild(old_gui);
+}
 var audio_library_browser = document.querySelector('[class="audio-library-browser"]');
-var last_line = audio_library_browser.insertBefore(div, audio_library_browser.firstChild);
+audio_library_browser.insertBefore(gui, audio_library_browser.firstChild);
