@@ -94,14 +94,16 @@ function newResult(file) {
 function newResults() {
 	var result_table = document.createElement("table");
 	result_table.setAttribute("width", "100%");
+	result_table.style.borderCollapse = "separate";
+	result_table.style.borderSpacing = "5px";
 
 	var results = {
 		table: result_table,
 
-		add_row: function(list) {
+		add_header: function(list) {
 			var row = newRow();
 			for (var i = 0; i < list.length; ++i) {
-				row.add(list[i]);
+				row.add_header(list[i]);
 			}
 			this.table.appendChild(row.element);
 		},
@@ -137,7 +139,7 @@ function newResults() {
 			}
 		}
 	};
-	results.add_row(["File name", "Found", "Artist", "Title", "Using restrictions", "Query"]);
+	results.add_header(["File name", "Found", "Artist", "Title", "Using restrictions", "Query"]);
 
 	return results;
 }
@@ -165,6 +167,12 @@ function newRow() {
 			td.setAttribute("title", title);
 			td.innerHTML += text;
 			this.element.appendChild(td);
+		},
+
+		add_header: function(text) {
+			var th = document.createElement("th");
+			th.innerHTML += text;
+			this.element.appendChild(th);
 		}
 
 	}
