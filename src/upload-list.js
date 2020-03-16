@@ -88,30 +88,33 @@ function add_result(result) {
 
 function create_td(text) {
 	var td = document.createElement("td");
+	if (text.length > 100) {
+		td.setAttribute("title", text);
+		text = text.substring(0, 100) + "...";
+	}
 	td.innerHTML += text;
 	return td;
 }
 
 function format_policy(response) {
 	if (!response.is_available) {
-		return "no";
+		return "Not available anywhere";
 	}
 	if (response.sr_policy
 		&& response.sr_policy.restrictions
 		&& response.sr_policy.restrictions.blocked_terr_names) {
 
 		var blocked_terr = response.sr_policy.restrictions.blocked_terr_names;
-		if (blocked_terr.includes(country_text.value)) {
-			return "no";
-		}
+		var countries_list = blocked_terr.toString();
+		return countries_list;
 	}
-	return "yes";
+	return "No restrictions";
 }
 
 function oncheck() {
 	console.log("check_button.onclick");
-	if (country_text.value === "") {
-		alert("Type your country name");
+	if (file_selector.files.length == 0) {
+		alert("Select files to check");
 		return;
 	}
 	var files = file_selector.files;
@@ -131,6 +134,10 @@ var file_selector = document.createElement("input");
 file_selector.setAttribute("type", "file");
 file_selector.setAttribute("multiple", "");
 
+var file_selector_label = document.createElement("label");
+file_selector_label.innerHTML += "Select files: ";
+file_selector_label.appendChild(file_selector);
+
 var check_button = document.createElement("input");
 check_button.setAttribute("type", "button");
 check_button.setAttribute("value", "Check");
@@ -141,15 +148,8 @@ loading_img.setAttribute("class", "yt-spinner-img  yt-sprite");
 // TODO: find out when one should use setAttribute and when fields?
 loading_img.style.visibility = "hidden";
 
-var country_label = document.createElement("label");
-country_label.innerHTML += "Your country name: ";
-var country_text = document.createElement("input");
-country_text.setAttribute("type", "text");
-country_label.appendChild(country_text);
-
 var button_div = document.createElement("div");
-button_div.appendChild(country_label);
-button_div.appendChild(file_selector);
+button_div.appendChild(file_selector_label);
 button_div.appendChild(check_button);
 button_div.appendChild(loading_img);
 
@@ -160,7 +160,7 @@ add_result({
 	found: "Found",
 	artist: "Artist",
 	title: "Title",
-	restricted_countries: "Available in your country",
+	restricted_countries: "Using restrictions",
 	query: "Query"
 });
 
