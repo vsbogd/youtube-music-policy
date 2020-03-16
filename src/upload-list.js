@@ -1,13 +1,6 @@
 function get_policy(file, callback) {
 	var filename = file.name;
-	var result = {
-		filename: filename,
-		found: "",
-		artist: "",
-		title: "",
-		restricted_countries: "",
-		query: ""
-	};
+	var result = newResult(file); 
 	console.log("get_policy: filename = " + filename);
 	get_query(file, function(query) {
 		result.query = query;
@@ -18,8 +11,8 @@ function get_policy(file, callback) {
 		$.getJSON(url, function(response) {
 			console.log("request asset filename: " + filename + ", response: " + JSON.stringify(response));
 			if (response.tracks.length == 0) {
-				result.found = "no";
-				add_result(result);
+				result.found = false;
+				results.add(result);
 				callback();
 				return;
 			}
@@ -34,9 +27,9 @@ function get_policy(file, callback) {
 			console.log("request policy filename: " + filename + ", url: " + url);
 			$.getJSON(url, function(response) {
 				console.log("request policy response: " + filename + ", response: " + JSON.stringify(response));
-				result.found = "yes";
-				result.restricted_countries = format_policy(response);
-				add_result(result);
+				result.found = true;
+				result.add_restrictions(response);
+				results.add(result);
 				callback();
 			});
 		});
@@ -74,41 +67,107 @@ function filename_to_query(filename) {
 	return query;
 }
 
-function add_result(result) {
-	console.log("add_result: result: " + JSON.stringify(result));
-	var row = document.createElement("tr");
-	row.appendChild(create_td(result.filename));
-	row.appendChild(create_td(result.found));
-	row.appendChild(create_td(result.artist));
-	row.appendChild(create_td(result.title));
-	row.appendChild(create_td(result.restricted_countries));
-	row.appendChild(create_td(result.query));
-	result_table.appendChild(row);
+function newResult(file) {
+	return {
+		file: file,
+		found: false,
+		artist: "",
+		title: "",
+		is_available: true,
+		restricted_countries: [],
+		query: "",
+
+		add_restrictions: function(response) {
+			this.is_available = response.is_available;
+			if (response.sr_policy
+				&& response.sr_policy.restrictions
+				&& response.sr_policy.restrictions.blocked_terr_names) {
+				var blocked_terr = response.sr_policy.restrictions.blocked_terr_names;
+				this.restricted_countries = blocked_terr;
+			} else {
+				this.restricted_countries = [];
+			}
+		}
+	};
 }
 
-function create_td(text) {
-	var td = document.createElement("td");
-	if (text.length > 100) {
-		td.setAttribute("title", text);
-		text = text.substring(0, 100) + "...";
-	}
-	td.innerHTML += text;
-	return td;
+function newResults() {
+	var result_table = document.createElement("table");
+	result_table.setAttribute("width", "100%");
+
+	var results = {
+		table: result_table,
+
+		add_row: function(list) {
+			var row = newRow();
+			for (var i = 0; i < list.length; ++i) {
+				row.add(list[i]);
+			}
+			this.table.appendChild(row.element);
+		},
+
+		add: function(result) {
+			console.log("results.add: result: " + JSON.stringify(result));
+			var row = newRow();
+			row.add(result.file.name);
+			row.add(yes_no(result.found));
+			row.add(result.artist);
+			row.add(result.title);
+			this._add_countries(row, result);
+			row.add(result.query);
+			this.table.appendChild(row.element);
+		},
+
+		_add_countries: function(row, result) {
+			if (!result.is_available) {
+				row.add("Not available anywhere");
+				return;
+			}
+			if (result.restricted_countries.length == 0) {
+				row.add("Available everywhere");
+				return;
+			}
+			var countries = result.restricted_countries.join();
+			if (countries.length < 100) {
+				row.add(countries);
+			} else {
+				row.add_with_title(countries.substring(0, 100) + "... ("
+					+ result.restricted_countries.length + " countries)",
+					countries);
+			}
+		}
+	};
+	results.add_row(["File name", "Found", "Artist", "Title", "Using restrictions", "Query"]);
+
+	return results;
 }
 
-function format_policy(response) {
-	if (!response.is_available) {
-		return "Not available anywhere";
+function yes_no(bool) {
+	if (bool) {
+		return "yes";
+	} else {
+		return "no";
 	}
-	if (response.sr_policy
-		&& response.sr_policy.restrictions
-		&& response.sr_policy.restrictions.blocked_terr_names) {
+}
 
-		var blocked_terr = response.sr_policy.restrictions.blocked_terr_names;
-		var countries_list = blocked_terr.toString();
-		return countries_list;
+function newRow() {
+	return {
+		element: document.createElement("tr"),
+
+		add: function(text) {
+			var td = document.createElement("td");
+			td.innerHTML += text;
+			this.element.appendChild(td);
+		},
+
+		add_with_title: function(text, title) {
+			var td = document.createElement("td");
+			td.setAttribute("title", title);
+			td.innerHTML += text;
+			this.element.appendChild(td);
+		}
+
 	}
-	return "No restrictions";
 }
 
 function oncheck() {
@@ -155,21 +214,12 @@ button_div.appendChild(file_selector_label);
 button_div.appendChild(check_button);
 button_div.appendChild(loading_img);
 
-var result_table = document.createElement("table");
-result_table.setAttribute("width", "100%");
-add_result({
-	filename: "File name",
-	found: "Found",
-	artist: "Artist",
-	title: "Title",
-	restricted_countries: "Using restrictions",
-	query: "Query"
-});
+var results = newResults();
 
 var gui = document.createElement("div");
 gui.setAttribute("id", "youtube-music-policy-extension");
 gui.appendChild(button_div);
-gui.appendChild(result_table);
+gui.appendChild(results.table);
 
 var old_gui = document.querySelector('[id="youtube-music-policy-extension"]');
 if (old_gui != null) {
