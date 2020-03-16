@@ -149,6 +149,8 @@ loading_img.setAttribute("class", "yt-spinner-img  yt-sprite");
 loading_img.style.visibility = "hidden";
 
 var button_div = document.createElement("div");
+button_div.setAttribute("width", "100%");
+button_div.setAttribute("align", "right");
 button_div.appendChild(file_selector_label);
 button_div.appendChild(check_button);
 button_div.appendChild(loading_img);
