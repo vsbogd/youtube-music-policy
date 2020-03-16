@@ -4,7 +4,7 @@
   "description": "Check YouTube music policy for the multiple files at once",
   "main": "index.js",
   "devDependencies": {
-    "web-ext": "^3.0.0"
+    "web-ext": "^4.1.0"
   },
   "repository": {
     "type": "git",
