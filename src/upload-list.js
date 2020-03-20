@@ -11,7 +11,7 @@ function get_policy(file, callback) {
 		$.getJSON(url, function(response) {
 			console.log("request asset filename: " + filename + ", response: " + JSON.stringify(response));
 			if (response.tracks.length == 0) {
-				result.found = false;
+				result.status = "not found";
 				results.add(result);
 				callback();
 				return;
@@ -27,11 +27,19 @@ function get_policy(file, callback) {
 			console.log("request policy filename: " + filename + ", url: " + url);
 			$.getJSON(url, function(response) {
 				console.log("request policy response: " + filename + ", response: " + JSON.stringify(response));
-				result.found = true;
+				result.status = "found";
 				result.add_restrictions(response);
 				results.add(result);
 				callback();
+			}).fail(function() {
+				result.status = "error";
+				results.add(result);
+				return;
 			});
+		}).fail(function() {
+			result.status = "error";
+			results.add(result);
+			return;
 		});
 	});
 }
@@ -70,7 +78,7 @@ function filename_to_query(filename) {
 function newResult(file) {
 	return {
 		file: file,
-		found: false,
+		status: "",
 		artist: "",
 		title: "",
 		is_available: true,
@@ -97,66 +105,103 @@ function newResults() {
 	result_table.style.borderCollapse = "separate";
 	result_table.style.borderSpacing = "5px";
 
+	var country_select = document.createElement("select");
+	country_select.style.maxWidth = "40px";
+
 	var results = {
 		table: result_table,
+		results: [],
+		country_select: country_select,
+		country_set: new Set(),
 
-		add_header: function(list) {
+		add_header: function() {
 			var row = newRow();
-			for (var i = 0; i < list.length; ++i) {
-				row.add_header(list[i]);
-			}
+			row.add_text_header("File name");
+			row.add_text_header("Status");
+			row.add_element_header(country_select).style.maxWidth = "40px";
+			row.add_text_header("Artist");
+			row.add_text_header("Title");
+			row.add_text_header("Using restrictions");
+			row.add_text_header("Query");
 			this.table.appendChild(row.element);
 		},
 
 		add: function(result) {
 			console.log("results.add: result: " + JSON.stringify(result));
+			this.results.push(result);
 			var row = newRow();
-			row.add(result.file.name);
-			row.add(yes_no(result.found));
-			row.add(result.artist);
-			row.add(result.title);
+			row.add_text(result.file.name);
+			row.add_text(result.status);
+			row.add_text("");
+			row.add_text(result.artist);
+			row.add_text(result.title);
 			this._add_countries(row, result);
-			row.add(result.query);
+			row.add_text(result.query);
 			this.table.appendChild(row.element);
 		},
 
 		_add_countries: function(row, result) {
 			if (!result.is_available) {
-				row.add("Not available anywhere");
+				row.add_text("Not available anywhere");
 				return;
 			}
 			if (result.restricted_countries.length == 0) {
-				row.add("Available everywhere");
+				row.add_text("Available everywhere");
 				return;
+			}
+			for (var i = 0; i < result.restricted_countries.length; ++i) {
+				this._add_country(result.restricted_countries[i]);
 			}
 			var countries = result.restricted_countries.join();
 			if (countries.length < 100) {
-				row.add(countries);
+				row.add_text(countries);
 			} else {
 				row.add_with_title(countries.substring(0, 100) + "... ("
 					+ result.restricted_countries.length + " countries)",
 					countries);
 			}
+		},
+
+		_add_country: function(country) {
+			if (this.country_set.has(country)) {
+				return;
+			}
+			console.log("results._add_country:", country);
+			this.country_set.add(country);
+			var option = document.createElement("option");
+			option.setAttribute("value", country);
+			option.innerHTML += country;
+			this.country_select.appendChild(option);
+		},
+
+		on_country_change: function(event) {
+			console.log("results.on_country_change:", event);
+			var country = event.target.value;
+			for (var i = 0; i < this.results.length; ++i) {
+				var result = this.results[i];
+				var flag = "yes";
+				if (!result.is_available ||
+					result.restricted_countries.includes(country)) {
+					flag = "no";
+				}
+				this.table.children[i + 1].children[2].innerHTML = flag;
+			}
 		}
 	};
-	results.add_header(["File name", "Found", "Artist", "Title", "Using restrictions", "Query"]);
+
+	results.add_header();
+	country_select.onchange = function(event) {
+		results.on_country_change(event);
+	}
 
 	return results;
-}
-
-function yes_no(bool) {
-	if (bool) {
-		return "yes";
-	} else {
-		return "no";
-	}
 }
 
 function newRow() {
 	return {
 		element: document.createElement("tr"),
 
-		add: function(text) {
+		add_text: function(text) {
 			var td = document.createElement("td");
 			td.innerHTML += text;
 			this.element.appendChild(td);
@@ -169,10 +214,17 @@ function newRow() {
 			this.element.appendChild(td);
 		},
 
-		add_header: function(text) {
+		add_text_header: function(text) {
 			var th = document.createElement("th");
 			th.innerHTML += text;
 			this.element.appendChild(th);
+		},
+
+		add_element_header: function(element) {
+			var th = document.createElement("th");
+			th.appendChild(element);
+			this.element.appendChild(th);
+			return th;
 		}
 
 	}
