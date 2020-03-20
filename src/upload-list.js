@@ -180,10 +180,13 @@ function newResults() {
 			for (var i = 0; i < this.results.length; ++i) {
 				var result = this.results[i];
 				var flag = "yes";
+				var color = "";
 				if (!result.is_available ||
 					result.restricted_countries.includes(country)) {
 					flag = "no";
+					color = "red";
 				}
+				this.table.children[i + 1].style.backgroundColor = color;
 				this.table.children[i + 1].children[2].innerHTML = flag;
 			}
 		}
