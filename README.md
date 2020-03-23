@@ -19,3 +19,5 @@ Results are placed into `./build` directory.
 Thirdparty resources and libraries used:
 - [jQuery](https://jquery.com/)
 - [JavaScript ID3 reader](https://github.com/aadsm/JavaScript-ID3-Reader)
+- [Levenshtein
+  Distance](https://github.com/trekhleb/javascript-algorithms/tree/master/src/algorithms/string/levenshtein-distance)

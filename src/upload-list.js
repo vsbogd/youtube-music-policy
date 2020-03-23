@@ -3,10 +3,10 @@ function get_policy(file, callback) {
 	var result = newResult(file); 
 	console.log("get_policy: filename = " + filename);
 	get_query(file, function(query) {
-		result.query = query;
-		console.log("query: " + query);
+		result.query = query.text;
+		console.log("query: " + JSON.stringify(query));
 		var url = "https://www.youtube.com/audioswap_ajax?action_get_tracks=1&q=" +
-			encodeURIComponent(query) + "&s=ad_supported_music&mr=25&si=0&qid=1&sh=true";
+			encodeURIComponent(query.text) + "&s=ad_supported_music&mr=25&si=0&qid=1&sh=true";
 		console.log("request asset filename: " + filename + ", url: " + url);
 		$.getJSON(url, function(response) {
 			console.log("request asset filename: " + filename + ", response: " + JSON.stringify(response));
@@ -16,7 +16,7 @@ function get_policy(file, callback) {
 				callback();
 				return;
 			}
-			var track = response.tracks[0];
+			var track = find_best_match(response.tracks, query);
 			result.artist = track.artist;
 			result.title = track.title;
 			var asset_id = track.asset_id;
@@ -44,6 +44,38 @@ function get_policy(file, callback) {
 	});
 }
 
+function find_best_match(tracks, query) {
+	var min_score = get_score(tracks[0], query);
+	var best_match = tracks[0];
+	for (var i = 1; i < tracks.length; ++i) {
+		var score = get_score(tracks[i], query);
+		if (score < min_score) {
+			min_score = score;
+			best_match = tracks[i];
+		}
+	}
+	console.log("find_best_match: min_score: " + min_score + ", best_match: " + best_match);
+	return best_match;
+}
+
+function get_score(track, query) {
+	var score = string_dist(track.title, query.title);
+	if (query.artist !== undefined) {
+		score += 100 * string_dist(track.artist, query.artist);
+	}
+	console.log("get_score: track: " + JSON.stringify(track) +
+		", query: " + JSON.stringify(query) + ", score: " + score);
+	return score;
+}
+
+function string_dist(a, b) {
+	if (a.startsWith(b) || b.startsWith(a)) {
+		return 0;
+	}
+	var dist = levenshteinDistance(a, b);
+	return dist;
+}
+
 function read_id3(file, callback) {
 	var filename = file.name;
 	ID3.loadTags(filename, function() {
@@ -59,9 +91,17 @@ function get_query(file, callback) {
 	read_id3(file, function(tags) {
 		console.log("read_id3: filename: " + filename + ", tags: " + JSON.stringify(tags));
 		if ("artist" in tags && "title" in tags) {
-			callback(tags.artist + " " + tags.title);
+			callback({
+				text: tags.artist + " " + tags.title,
+				artist: tags.artist,
+				title: tags.title
+			});
 		} else {
-			callback(filename_to_query(filename));
+			var text = filename_to_query(filename);
+			callback({
+				text: text,
+				title: text
+			});
 		}
 	});
 }

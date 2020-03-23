@@ -11,9 +11,10 @@
   
   "content_scripts": [
   	  {
-  	  	  "matches": ["*://*.youtube.com/music_policies*"],
-  	  	  "js": ["upload-list.js", "thirdparty/jquery-3.4.1.min.js",
-  	  	  	  "thirdparty/id3-minimized.js"]
+  	  	  "matches": ["*://*.youtube.com/music_policies*"], "js":
+  	  	  ["upload-list.js", "thirdparty/jquery-3.4.1.min.js",
+  	  	  	  "thirdparty/id3-minimized.js",
+  	  	  	  "thirdparty/levenshteinDistance.js"]
   	  }
   ]
 }
