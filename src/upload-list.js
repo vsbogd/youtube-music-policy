@@ -210,7 +210,7 @@ function newResults() {
 			this.country_set.add(country);
 			var option = document.createElement("option");
 			option.setAttribute("value", country);
-			option.innerHTML += country;
+			option.textContent += country;
 			this.country_select.appendChild(option);
 		},
 
@@ -227,7 +227,7 @@ function newResults() {
 					color = "red";
 				}
 				this.table.children[i + 1].style.backgroundColor = color;
-				this.table.children[i + 1].children[2].innerHTML = flag;
+				this.table.children[i + 1].children[2].textContent = flag;
 			}
 		}
 	};
@@ -246,20 +246,20 @@ function newRow() {
 
 		add_text: function(text) {
 			var td = document.createElement("td");
-			td.innerHTML += text;
+			td.textContent += text;
 			this.element.appendChild(td);
 		},
 
 		add_with_title: function(text, title) {
 			var td = document.createElement("td");
 			td.setAttribute("title", title);
-			td.innerHTML += text;
+			td.textContent += text;
 			this.element.appendChild(td);
 		},
 
 		add_text_header: function(text) {
 			var th = document.createElement("th");
-			th.innerHTML += text;
+			th.textContent += text;
 			this.element.appendChild(th);
 		},
 
@@ -297,7 +297,7 @@ file_selector.setAttribute("type", "file");
 file_selector.setAttribute("multiple", "");
 
 var file_selector_label = document.createElement("label");
-file_selector_label.innerHTML += "Select files: ";
+file_selector_label.textContent += "Select files: ";
 file_selector_label.appendChild(file_selector);
 
 var check_button = document.createElement("input");
