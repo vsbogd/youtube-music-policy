@@ -328,5 +328,13 @@ var old_gui = document.querySelector('[id="youtube-music-policy-extension"]');
 if (old_gui != null) {
 	old_gui.parentNode.removeChild(old_gui);
 }
-var audio_library_browser = document.querySelector('[class="audio-library-browser"]');
-audio_library_browser.insertBefore(gui, audio_library_browser.firstChild);
+
+var add_controls = function() {
+	var original_control = document.querySelector('[id="main-title"]');
+	if (original_control) {
+		original_control.insertBefore(gui, original_control.firstChild);
+	} else {
+		setTimeout(add_controls, 100);
+	}
+}
+setTimeout(add_controls, 100);

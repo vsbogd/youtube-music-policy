@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "YouTube Music Policy",
-  "version": "1.0",
+  "version": "1.1",
 
   "description": "A web extention to automate checking large amount of music files via YouTube music policy web-page.",
 
@@ -11,7 +11,7 @@
   
   "content_scripts": [
   	  {
-  	  	  "matches": ["*://*.youtube.com/music_policies*"], "js":
+  	  	  "matches": ["*://*.youtube.com/audiolibrary/music*"], "js":
   	  	  ["upload-list.js", "thirdparty/jquery-3.4.1.min.js",
   	  	  	  "thirdparty/id3-minimized.js",
   	  	  	  "thirdparty/levenshteinDistance.js"]
